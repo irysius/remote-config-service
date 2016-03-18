@@ -106,7 +106,7 @@ describe('remote-config-service', function () {
 	it('is expected to use alternate locators', function (done) {
 		// This is NOT a real endpoint. Do not try to provide this.
 		process.env.IRY_REMOTE_ENDPOINT = 'http://localhost/remote-config';
-		process.env.IRY_REMOTE_ACCESS_TOKEN = 'a1s2d3f4';
+		process.env.IRY_REMOTE_ACCESS_TOKEN = 'f4d3s2a1';
 		process.env.IRY_REMOTE_ENVIRONMENT = 'debug';
 		
 		function initialLocator(info) {
@@ -114,7 +114,7 @@ describe('remote-config-service', function () {
 			newInfo.endpoint = 'http://localhost/alternate-config';
 			return newInfo;
 		}
-		function jitLocator(config, info) {
+		function jitLocator(info, config) {
 			info.application_key = 'charlie';
 			info.environment = 'debug';
 			return info;
@@ -125,7 +125,7 @@ describe('remote-config-service', function () {
 		var targetConfig = {
 			alpha: 'bravo', omega: 'gamma', application_key: 'beta',
 			server: 'alternate-config',
-			content: '002' // test charlie
+			content: '009' // debug charlie
 		};
 		
 		Promise.resolve().then(function () {

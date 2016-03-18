@@ -12,7 +12,7 @@ function defaultInitialLocator(info = {}) {
 	if (process.env[ENVIRONMENT]) { values.environment = process.env[ENVIRONMENT]; }
 	return _.assign(info, values);	
 }
-function defaultJitLocator(config = {}, info = {}) {
+function defaultJitLocator(info = {}, config = {}) {
 	let values = {};
 	if (config.remote_config) {
 		let remote_config = config.remote_config;
@@ -25,7 +25,7 @@ function defaultJitLocator(config = {}, info = {}) {
 	return _.assign(info, values);
 }
 
-function RemoteConfigService({ initialLocator, jitLocator }) {
+function RemoteConfigService({ initialLocator = null, jitLocator = null } = {}) {
 	let il = _.isFunction(initialLocator) ? initialLocator : defaultInitialLocator;
 	let jl = _.isFunction(jitLocator) ? jitLocator : defaultJitLocator;
 	
@@ -33,7 +33,17 @@ function RemoteConfigService({ initialLocator, jitLocator }) {
 	info = il(info);
 	
 	function validate(info) {
-		
+		return Promise.resolve().then(() => {
+			if (!info || !info.endpoint || !info.access_token ||
+				!info.environment || !info.application_key)
+			{
+				let error =  new Error('Missing required info for connecting to remote service.');
+				error.value = info;
+				throw error;
+			} else {
+				return info;
+			}
+		});
 	}
 	
 	function connect(options) {
@@ -84,7 +94,22 @@ function RemoteConfigService({ initialLocator, jitLocator }) {
 	}
 	
 	function transform(config) {
-		
+		info = jl(info, config);
+		console.log(info);
+		return validate(info).then(info => {
+			let options = {
+				url: info.endpoint,
+				method: 'POST',
+				body: {
+					access_token: info.access_token,
+					environment: info.environment,
+					application_key: info.application_key
+				}
+			};
+			return connect(options);
+		}).then(content => {
+			return _.assign({}, config, content);
+		});
 	}
 	
 	return {
