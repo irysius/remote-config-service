@@ -94,13 +94,9 @@ But you may use it as a standalone like so:
 		environment?: String,
 		application_key?: String
 	}
-	
-### interface Locator
-
-	(ConnectionInfo) => ConnectionInfo
 
 ### constructor
-`RemoteConfigService(options?: { initialLocator?: Locator, jitLocator?: Locator })`
+`RemoteConfigService(options?: { initialLocator?: (ConnectionInfo) => ConnectionInfo, jitLocator?: (Config, ConnectionInfo) => ConnectionInfo })`
 
 Constructor for the config service. You may override the default locators (for the connection information) by providing an alternate implementation.
 
@@ -120,7 +116,7 @@ Sets the following fields (should the values exist), then returns the updated in
 * `environment` gets assigned with `process.env.IRY_REMOTE_ENVIRONMENT`.
 
 ### RemoteConfigService.defaults.jitLocator
-`(ConnectionInfo) => ConnectionInfo`
+`(Config, ConnectionInfo) => ConnectionInfo`
 
 Default implementation of the just-in-time locator of the connection information.
 
